@@ -1,7 +1,7 @@
 validators==0.18.2
 torch==1.8.1
 torchvision==0.9.1
-timm==0.4.5
+timm==0.5.4
 lmdb==1.2.1
 pillow>=8.3.2
 nltk>=3.6.4
