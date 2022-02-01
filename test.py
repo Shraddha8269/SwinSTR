@@ -118,9 +118,9 @@ def validation(model, criterion, evaluation_loader, converter, opt):
         preds_max_prob, _ = preds_prob.max(dim=2)
         confidence_score_list = []
         for gt, pred, pred_max_prob in zip(labels, preds_str, preds_max_prob):
-              pred_EOS = pred.find('[s]')
-              pred = pred[:pred_EOS]  # prune after "end of sentence" token ([s])
-              pred_max_prob = pred_max_prob[:pred_EOS]
+            pred_EOS = pred.find('[s]')
+            pred = pred[:pred_EOS]  # prune after "end of sentence" token ([s])
+            pred_max_prob = pred_max_prob[:pred_EOS]
             
             # To evaluate 'case sensitive model' with alphanumeric and case insensitve setting.
             if opt.sensitive and opt.data_filtering_off:
