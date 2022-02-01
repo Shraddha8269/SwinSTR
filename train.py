@@ -182,12 +182,9 @@ def train(opt):
                 head = f'{"Ground Truth":25s} | {"Prediction":25s} | Confidence Score & T/F'
                 predicted_result_log = f'{dashed_line}\n{head}\n{dashed_line}\n'
                 for gt, pred, confidence in zip(labels[:5], preds[:5], confidence_score[:5]):
-                    if opt.Transformer:
-                        pred = pred[:pred.find('[s]')]
-                    elif 'Attn' in opt.Prediction:
-                        gt = gt[:gt.find('[s]')]
-                        pred = pred[:pred.find('[s]')]
-
+                    
+                    pred = pred[:pred.find('[s]')]
+                   
                     # To evaluate 'case sensitive model' with alphanumeric and case insensitve setting.
                     if opt.sensitive and opt.data_filtering_off:
                         pred = pred.lower()
@@ -220,7 +217,7 @@ if __name__ == '__main__':
     opt = get_args()
 
     if not opt.exp_name:
-        opt.exp_name = f'{opt.TransformerModel}' if opt.Transformer else f'{opt.Transformation}-{opt.FeatureExtraction}-{opt.SequenceModeling}-{opt.Prediction}'
+        opt.exp_name = f'{opt.TransformerModel}' 
 
     opt.exp_name += f'-Seed{opt.manualSeed}'
 
