@@ -32,9 +32,7 @@ class TokenLabelConverter(object):
         """ convert text-index into text-label. """
         texts = []
         for index, l in enumerate(length):
-            m=[i for i in text_index[index,:]]
-            print(m)
-            print(self.character)
+            
             text = ''.join([self.character[i] for i in text_index[index, :]])
             texts.append(text)
         return texts
