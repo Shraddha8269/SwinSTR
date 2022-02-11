@@ -114,7 +114,7 @@ def load_pretrained(model, cfg=None, num_classes=1000, in_chans=1, filter_fn=Non
         del state_dict[classifier_name + '.bias']
         strict = False
 
-    print("Loading pre-trained vision transformer weights from %s ..." % cfg['url'])
+    print("Loading pre-trained swin transformer weights from %s ..." % cfg['url'])
     model.load_state_dict(state_dict, strict=strict)
 
 
