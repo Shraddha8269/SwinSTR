@@ -37,6 +37,7 @@ class SWINSTR(SwinTransformer):
     
     def reset_classifier(self, num_classes):
         self.num_classes = num_classes
+        
         self.embed_dim=768
         self.head = nn.Linear(self.embed_dim, num_classes) if num_classes > 0 else nn.Identity()
 
@@ -143,7 +144,7 @@ def swinstr_small_patch16_224(pretrained=False, **kwargs):
 def swinstr_base_patch16_224(pretrained=False, **kwargs):
     kwargs['in_chans'] = 1
     model = SWINSTR(
-         patch_size=4, window_size=7, embed_dim=128, depths=(2, 2, 18, 2), num_heads=(4, 8, 16, 32), **kwargs))
+         patch_size=4, window_size=7, embed_dim=128, depths=(2, 2, 18, 2), num_heads=(4, 8, 16, 32), **kwargs)
     model.default_cfg = _cfg(
             #url='https://github.com/roatienza/public/releases/download/v0.1-deit-base/deit_base_patch16_224-b5f2ef4d.pth'
             url='https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_base_patch4_window7_224_22kto1k.pth'
