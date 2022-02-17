@@ -142,8 +142,8 @@ def swinstr_small_patch16_224(pretrained=False, **kwargs):
 @register_model
 def swinstr_base_patch16_224(pretrained=False, **kwargs):
     kwargs['in_chans'] = 1
-    model = ViTSTR(
-        patch_size=16, embed_dim=768, depth=12, num_heads=12, mlp_ratio=4, qkv_bias=True, **kwargs)
+    model = SWINSTR(
+         patch_size=4, window_size=7, embed_dim=128, depths=(2, 2, 18, 2), num_heads=(4, 8, 16, 32), **kwargs))
     model.default_cfg = _cfg(
             #url='https://github.com/roatienza/public/releases/download/v0.1-deit-base/deit_base_patch16_224-b5f2ef4d.pth'
             url='https://github.com/SwinTransformer/storage/releases/download/v1.0.0/swin_base_patch4_window7_224_22kto1k.pth'
