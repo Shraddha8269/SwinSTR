@@ -38,7 +38,7 @@ class SWINSTR(SwinTransformer):
     def reset_classifier(self, num_classes):
         self.num_classes = num_classes
         
-        self.embed_dim=768
+        self.embed_dim=1024
         self.head = nn.Linear(self.embed_dim, num_classes) if num_classes > 0 else nn.Identity()
 
     def forward_features(self, x):
