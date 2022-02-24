@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import math
-from modules.swinstr import create_swinstr
+from modules.swinstr2 import create_swinstr
 
 class Model(nn.Module):
 
