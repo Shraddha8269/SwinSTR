@@ -340,7 +340,56 @@ class DWConv(nn.Module):
         x = x.flatten(2).transpose(1, 2)
 
         return x
+def load_pretrained(model, cfg=None, num_classes=1000, in_chans=1, filter_fn=None, strict=True):
+   
+    if cfg is None:
+        cfg = getattr(model, 'default_cfg')
+    if cfg is None or 'url' not in cfg or not cfg['url']:
+        _logger.warning("Pretrained model URL is invalid, using random initialization.")
+        return
 
+    state_dict = model_zoo.load_url(cfg['url'], progress=True, map_location='cpu')
+    if "model" in state_dict.keys():
+        state_dict = state_dict["model"]
+
+    #if filter_fn is not None:
+     #   state_dict = filter_fn(state_dict)
+
+    if in_chans == 1:
+        conv1_name = cfg['first_conv']
+        _logger.info('Converting first conv (%s) pretrained weights from 3 to 1 channel' % conv1_name)
+        key = conv1_name + '.weight'
+        if key in state_dict.keys():
+            _logger.info('(%s) key found in state_dict' % key)
+            conv1_weight = state_dict[conv1_name + '.weight']
+        else:
+            _logger.info('(%s) key NOT found in state_dict' % key)
+            return
+        conv1_type = conv1_weight.dtype
+        conv1_weight = conv1_weight.float()
+        O, I, J, K = conv1_weight.shape
+        if I > 3:
+            assert conv1_weight.shape[1] % 3 == 0
+            conv1_weight = conv1_weight.reshape(O, I // 3, 3, J, K)
+            conv1_weight = conv1_weight.sum(dim=2, keepdim=False)
+        else:
+            conv1_weight = conv1_weight.sum(dim=1, keepdim=True)
+        conv1_weight = conv1_weight.to(conv1_type)
+        state_dict[conv1_name + '.weight'] = conv1_weight
+
+    classifier_name = cfg['classifier']
+    if num_classes == 1000 and cfg['num_classes'] == 1001:
+        classifier_weight = state_dict[classifier_name + '.weight']
+        state_dict[classifier_name + '.weight'] = classifier_weight[1:]
+        classifier_bias = state_dict[classifier_name + '.bias']
+        state_dict[classifier_name + '.bias'] = classifier_bias[1:]
+    elif num_classes != cfg['num_classes']:
+        del state_dict[classifier_name + '.weight']
+        del state_dict[classifier_name + '.bias']
+        strict = False
+
+    print("Loading pre-trained swin transformer weights from %s ..." % cfg['url'])
+    model.load_state_dict(state_dict, strict=strict)
 
 def _conv_filter(state_dict, patch_size=16):
     """ convert patch embedding weight from manual patchify + linear proj to conv"""
