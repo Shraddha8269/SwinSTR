@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -6,9 +9,7 @@ from timm.models.layers import DropPath, to_2tuple, trunc_normal_
 from timm.models.registry import register_model
 from timm.models.vision_transformer import _cfg
 import math
-from __future__ import absolute_import
-from __future__ import division
-from __future__ import print_function
+
 import logging
 import torch.utils.model_zoo as model_zoo
 from copy import deepcopy
@@ -226,6 +227,7 @@ class OverlapPatchEmbed(nn.Module):
                 m.bias.data.zero_()
 
     def forward(self, x):
+        print(x.shape)
         x = self.proj(x)
         _, _, H, W = x.shape
         x = x.flatten(2).transpose(1, 2)
@@ -251,7 +253,7 @@ class PyramidVisionTransformerV2(nn.Module):
             patch_embed = OverlapPatchEmbed(img_size=img_size if i == 0 else img_size // (2 ** (i + 1)),
                                             patch_size=7 if i == 0 else 3,
                                             stride=4 if i == 0 else 2,
-                                            in_chans=3 if i == 0 else embed_dims[i - 1],
+                                            in_chans=1 if i == 0 else embed_dims[i - 1],
                                             embed_dim=embed_dims[i])
 
             block = nn.ModuleList([Block(
@@ -298,7 +300,8 @@ class PyramidVisionTransformerV2(nn.Module):
 
     def reset_classifier(self, num_classes, global_pool=''):
         self.num_classes = num_classes
-        self.embed_dim = 768
+        self.embed_dim = 256
+        print(self.num_classes,self.embed_dim)
         self.head = nn.Linear(self.embed_dim, num_classes) if num_classes > 0 else nn.Identity()
 
     def forward_features(self, x):
@@ -317,12 +320,13 @@ class PyramidVisionTransformerV2(nn.Module):
 
         return x
 
-    def forward(self, x):
+    def forward(self, x,seqlen=25):
         x = self.forward_features(x)
         x = x[:, :seqlen]
 
         # batch, seqlen, embsize
         b, s, e = x.size()
+        print(b,s,e)
         x = x.reshape(b*s, e)
         x = self.head(x).view(b, s, self.num_classes)
         return x
@@ -340,6 +344,7 @@ class DWConv(nn.Module):
         x = x.flatten(2).transpose(1, 2)
 
         return x
+
 def load_pretrained(model, cfg=None, num_classes=1000, in_chans=1, filter_fn=None, strict=True):
    
     if cfg is None:
@@ -390,7 +395,6 @@ def load_pretrained(model, cfg=None, num_classes=1000, in_chans=1, filter_fn=Non
 
     print("Loading pre-trained swin transformer weights from %s ..." % cfg['url'])
     model.load_state_dict(state_dict, strict=strict)
-
 def _conv_filter(state_dict, patch_size=16):
     """ convert patch embedding weight from manual patchify + linear proj to conv"""
     out_dict = {}
