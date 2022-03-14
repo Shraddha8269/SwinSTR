@@ -117,7 +117,7 @@ def get_args(is_train=True):
     """ Model Architecture """
     parser.add_argument('--Transformer', action='store_true', help='Use end-to-end transformer')
 
-    choices = ["swinstr_small_patch16_224","swinstr_base_patch16_224"]
+    choices = ["swinstr_small_patch16_224","swinstr_base_patch16_224","pvt_v2_b0"]
     parser.add_argument('--TransformerModel', default=choices[0], help='Which vit/deit transformer model', choices=choices)
     parser.add_argument('--num_fiducial', type=int, default=20, help='number of fiducial points of TPS-STN')
     parser.add_argument('--input_channel', type=int, default=1,
