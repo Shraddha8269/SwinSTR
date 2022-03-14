@@ -251,7 +251,7 @@ class PyramidVisionTransformerV2(nn.Module):
             patch_embed = OverlapPatchEmbed(img_size=img_size if i == 0 else img_size // (2 ** (i + 1)),
                                             patch_size=7 if i == 0 else 3,
                                             stride=4 if i == 0 else 2,
-                                            in_chans=in_chans if i == 0 else embed_dims[i - 1],
+                                            in_chans=3 if i == 0 else embed_dims[i - 1],
                                             embed_dim=embed_dims[i])
 
             block = nn.ModuleList([Block(
