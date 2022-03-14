@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import math
-from modules.swinstr2 import create_swinstr
+from modules.pvt_str import create_pvtstr
 
 class Model(nn.Module):
 
@@ -12,5 +12,5 @@ class Model(nn.Module):
         return
 
     def forward(self, input, text, is_train=True, seqlen=25):
-            prediction = self.swinstr(input, seqlen=seqlen)
+            prediction = self.pvtstr(input, seqlen=seqlen)
             return prediction
