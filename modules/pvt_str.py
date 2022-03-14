@@ -300,8 +300,6 @@ class PyramidVisionTransformerV2(nn.Module):
 
     def reset_classifier(self, num_classes, global_pool=''):
         self.num_classes = num_classes
-        self.embed_dim = 256
-        print(self.num_classes,self.embed_dim)
         self.head = nn.Linear(self.embed_dim, num_classes) if num_classes > 0 else nn.Identity()
 
     def forward_features(self, x):
@@ -326,7 +324,7 @@ class PyramidVisionTransformerV2(nn.Module):
 
         # batch, seqlen, embsize
         b, s, e = x.size()
-        print(b,s,e)
+        #print(b,s,e)
         x = x.reshape(b*s, e)
         x = self.head(x).view(b, s, self.num_classes)
         return x
