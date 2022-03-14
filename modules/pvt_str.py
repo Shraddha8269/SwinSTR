@@ -2,11 +2,33 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from functools import partial
-
 from timm.models.layers import DropPath, to_2tuple, trunc_normal_
 from timm.models.registry import register_model
 from timm.models.vision_transformer import _cfg
 import math
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+import logging
+import torch.utils.model_zoo as model_zoo
+from copy import deepcopy
+import torch.utils.checkpoint as checkpoint
+from timm.models import create_model
+import timm
+
+_logger = logging.getLogger(__name__)
+
+
+def create_pvtstr(num_tokens, model=None, checkpoint_path=''):
+    pvtstr = create_model(
+        model,
+        pretrained=True,
+        num_classes=num_tokens,
+        checkpoint_path=checkpoint_path)
+
+    # might need to run to get zero init head for transfer learning
+    pvtstr.reset_classifier(num_classes=num_tokens)
+    return pvtstr
 
 
 class Mlp(nn.Module):
