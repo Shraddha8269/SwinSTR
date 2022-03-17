@@ -225,7 +225,7 @@ class UniFormer(nn.Module):
     A PyTorch impl of : `An Image is Worth 16x16 Words: Transformers for Image Recognition at Scale`  -
         https://arxiv.org/abs/2010.11929
     """
-    def __init__(self, depth=[3, 4, 8, 3], img_size=224, in_chans=3, num_classes=1000, embed_dim=[64, 128, 320, 512],
+    def __init__(self, depth=[3, 4, 8, 3], img_size=224, in_chans=1, num_classes=1000, embed_dim=[64, 128, 320, 512],
                  head_dim=64, mlp_ratio=4., qkv_bias=True, qk_scale=None, representation_size=None,
                  drop_rate=0., attn_drop_rate=0., drop_path_rate=0., norm_layer=None, conv_stem=False):
         """
@@ -323,13 +323,14 @@ class UniFormer(nn.Module):
 
     def reset_classifier(self, num_classes, global_pool=''):
         self.num_classes = num_classes
+        self.embed_dim=7
         self.head = nn.Linear(self.embed_dim, num_classes) if num_classes > 0 else nn.Identity()
 
     def forward_features(self, x):
         x = self.patch_embed1(x)
-        cls_tokens = self.cls_token.expand(B, -1, -1)  # stole cls_tokens impl from Phil Wang, thanks
-        x = torch.cat((cls_tokens, x), dim=1)
-        x = x + self.pos_embed
+        #cls_tokens = self.cls_token.expand(B, -1, -1)  # stole cls_tokens impl from Phil Wang, thanks
+        #x = torch.cat((cls_tokens, x), dim=1)
+        #x = x + self.pos_embed
         x = self.pos_drop(x)
         for blk in self.blocks1:
             x = blk(x)
@@ -343,12 +344,14 @@ class UniFormer(nn.Module):
         for blk in self.blocks4:
             x = blk(x)
         x = self.norm(x)
+        x = self.pre_logits(x)
         return x
 
-    def forward(self, x):
+    def forward(self, x,seqlen=25):
         x = self.forward_features(x)
+        x = x.flatten(3).mean(-1)
         x = x[:, :seqlen]
-
+        print(x.size)
         # batch, seqlen, embsize
         b, s, e = x.size()
         x = x.reshape(b*s, e)
