@@ -351,7 +351,7 @@ class UniFormer(nn.Module):
         x = self.forward_features(x)
         x = x.flatten(3).mean(-1)
         x = x[:, :seqlen]
-        print(x.size)
+        #print(x.size)
         # batch, seqlen, embsize
         b, s, e = x.size()
         x = x.reshape(b*s, e)
